@@ -5,6 +5,7 @@
   "description": "bot for graduation work",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/andrronov/bot_diploma#readme",
   "dependencies": {
+    "@grammyjs/hydrate": "^1.4.1",
     "dotenv": "^16.4.5",
     "grammy": "^1.22.4",
     "nodemon": "^3.1.0"
