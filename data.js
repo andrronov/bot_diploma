@@ -1,5 +1,7 @@
 const data = {
-   texture: [{path: 'matte', name: 'Матовые'}, {path: 'glossy', name: 'Глянцевые'}, {path: 'satin', name: 'Сатиновые'}, {path: 'fabric', name: 'Тканевые'}, {path: 'textured', name: 'Фактурные'}],
+   texture: [
+      {path: 'matte', name: 'Матовые'}, {path: 'glossy', name: 'Глянцевые'}, {path: 'satin', name: 'Сатиновые'}, {path: 'fabric', name: 'Тканевые'}, {path: 'textured', name: 'Фактурные'}
+   ],
    exclusive: [
        {path: 'photoprint', name: 'Фотопечать'}, 
        {path: '3d', name: '3D потолки'}, 

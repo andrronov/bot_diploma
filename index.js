@@ -6,53 +6,56 @@ import data from './data.js'
 const bot = new Bot(process.env.BOT_API_KEY)
 bot.use(hydrate())
 
+// КОМАНДЫ
 bot.api.setMyCommands([
    { command: 'start', description: 'Начать' },
    { command: 'support', description: 'Обратиться в техподдержку' },
-   { command: 'test', description: 'test' },
 ])
 
+// КЛАВИАТУРЫ
 const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').text('Корзина', 'cart').text('Мои заказы', 'orders')
-const backKeybrd = new InlineKeyboard().text('Назад', 'back')
-const catalogKeybrd = new InlineKeyboard()
+const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('С подсветкой', 'lightning').row().text('<< Назад', 'start')
+const textureKeybrd = new InlineKeyboard()
+const exclusiveKeybrd = new InlineKeyboard()
+const lightningKeybrd = new InlineKeyboard()
 
-let catalogButtons = []
-// for(let i = 0; i < Object.keys(data).length; i++){
-   // for(let j = 0; Object.keys(data)[i]; j++){
-      // catalogButtons[Object.keys(data)[i]] = ['a']
-   // }
-// }
-catalogButtons.forEach(but => {
-   catalogKeybrd.text(but.name, but.path).row()
-})
-console.log(catalogButtons);
-// bot.command('start', async (ctx) => {
-//    await ctx.reply('Добро пожаловать!', {
-//       reply_markup: menuKbrd
-//    })
-//    ctx.react("❤")
-// });
+// НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
+data.texture.forEach(val => textureKeybrd.text(val.name, val.path).row())
+data.exclusive.forEach(val => exclusiveKeybrd.text(val.name, val.path).row())
+data.lightning.forEach(val => lightningKeybrd.text(val.name, val.path).row())
 
-bot.command('test', async (ctx) => {
-   await ctx.reply('test', {
+// КОМАНДЫ
+bot.command('start', async (ctx) => {
+   await ctx.reply(`<b>${ctx.from.first_name}, добро пожаловать в магазин <a href='https://arsen-project.onrender.com/#/'>JBY-Group</a>!</b>`, {
+      reply_markup: menuKbrd,
+      parse_mode: 'HTML'
+   })
+   ctx.react("❤")
+});
+// доделать
+bot.command('support', async (ctx) => {
+   await ctx.reply('')
+});
+
+
+// КОЛЛБЕКИ
+bot.callbackQuery('catalog', async (ctx) => {
+   await ctx.callbackQuery.message.editText('Выберите интересующую Вас категорию', {
       reply_markup: catalogKeybrd
    })
-})
-
-bot.callbackQuery('catalog', async (ctx) => {
-   await ctx.callbackQuery.message.editText('Пизда', {
+   await ctx.answerCallbackQuery()
+});
+bot.callbackQuery('start', async (ctx) => {
+   await ctx.callbackQuery.message.editText('Выберите пункт меню', {
       reply_markup: menuKbrd
    })
    await ctx.answerCallbackQuery()
-   // await ctx.reply('Вот наш каталог товаров:');
 });
 
-// bot.command('start', async(ctx) => {
-//    await ctx.reply('Хули надо мудак')
-// })
 
+// РАЗНЫЕ СЛУШАТЕЛИ
 bot.on('msg', async(ctx) => {
-   await ctx.reply('Пошел нахуй')
+   await ctx.reply('jby')
 })
 
 bot.catch((err) => {
