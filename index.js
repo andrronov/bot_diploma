@@ -15,9 +15,11 @@ bot.api.setMyCommands([
 // КЛАВИАТУРЫ
 const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').text('Корзина', 'cart').text('Мои заказы', 'orders')
 const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('С подсветкой', 'lightning').row().text('<< Назад', 'start')
-const textureKeybrd = new InlineKeyboard()
-const exclusiveKeybrd = new InlineKeyboard()
-const lightningKeybrd = new InlineKeyboard()
+const textureKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
+const exclusiveKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
+const lightningKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
+// доработать
+const buyKeybrd = new InlineKeyboard().text('Купить', 'buy').row().text('< Назад', 'catalog')
 
 // НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
 data.texture.forEach(val => textureKeybrd.text(val.name, val.path).row())
@@ -51,6 +53,31 @@ bot.callbackQuery('start', async (ctx) => {
    })
    await ctx.answerCallbackQuery()
 });
+bot.callbackQuery('texture', async (ctx) => {
+   await ctx.callbackQuery.message.editText('Выберите тип потолка', {
+      reply_markup: textureKeybrd
+   })
+   await ctx.answerCallbackQuery()
+});
+bot.callbackQuery('exclusive', async (ctx) => {
+   await ctx.callbackQuery.message.editText('Выберите тип потолка', {
+      reply_markup: exclusiveKeybrd
+   })
+   await ctx.answerCallbackQuery()
+});
+bot.callbackQuery('lightning', async (ctx) => {
+   await ctx.callbackQuery.message.editText('Выберите тип потолка', {
+      reply_markup: lightningKeybrd
+   })
+   await ctx.answerCallbackQuery()
+});
+
+// обработка каждых потолков в списке по текстуре
+data.texture.forEach(type => {
+   bot.callbackQuery(type.path, async (ctx) => {
+      await ctx.replyWithPhoto(type.img, {caption: type.description, reply_markup: buyKeybrd})
+   })
+})
 
 
 // РАЗНЫЕ СЛУШАТЕЛИ
