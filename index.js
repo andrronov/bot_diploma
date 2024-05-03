@@ -19,7 +19,8 @@ const textureKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog'
 const exclusiveKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const lightningKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 // доработать
-const buyKeybrd = new InlineKeyboard().text('Купить', 'buy').row().text('< Назад', 'catalog')
+const buyKeybrd = new InlineKeyboard().text('Купить', 'buy').row().text('< Назад', 'catalog_delete')
+const categotyKeyboards = {textureKeybrd, exclusiveKeybrd, lightningKeybrd}
 
 // НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
 data.texture.forEach(val => textureKeybrd.text(val.name, val.path).row())
@@ -59,18 +60,19 @@ bot.callbackQuery('texture', async (ctx) => {
    })
    await ctx.answerCallbackQuery()
 });
-bot.callbackQuery('exclusive', async (ctx) => {
-   await ctx.callbackQuery.message.editText('Выберите тип потолка', {
-      reply_markup: exclusiveKeybrd
+
+// циклом назначил клавиатуры для возможных категорий
+Object.keys(data).forEach(category => {
+   const keyboardName = category + 'Keybrd'
+   const keyboard = categotyKeyboards[keyboardName]
+   // console.log(keyboard);
+   bot.callbackQuery(category, async (ctx) => {
+      await ctx.callbackQuery.message.editText('Выберите тип потолка', {
+         reply_markup: keyboard
+      })
+      await ctx.answerCallbackQuery()
    })
-   await ctx.answerCallbackQuery()
-});
-bot.callbackQuery('lightning', async (ctx) => {
-   await ctx.callbackQuery.message.editText('Выберите тип потолка', {
-      reply_markup: lightningKeybrd
-   })
-   await ctx.answerCallbackQuery()
-});
+})
 
 // обработка каждых потолков в списке по текстуре
 data.texture.forEach(type => {
