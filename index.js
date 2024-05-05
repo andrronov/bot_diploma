@@ -13,13 +13,14 @@ bot.api.setMyCommands([
 ])
 
 // КЛАВИАТУРЫ
-const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').text('Корзина', 'cart').text('Мои заказы', 'orders')
-const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('С подсветкой', 'lightning').row().text('<< Назад', 'start')
+const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').row().text('О нас', 'cart').text('Наш сайт', 'orders')
+//это основная клава с категорией подсветки const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('С подсветкой', 'lightning').row().text('Не знаете, что выбрать?', 'what_choose').row().text('<< Назад', 'start')
+const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('Не определились с выбором?', 'what_choose').row().text('<< Назад', 'start')
 const textureKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const exclusiveKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const lightningKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 // доработать
-const buyKeybrd = new InlineKeyboard().text('Купить', 'buy').row().text('< Назад', 'catalog_delete')
+const buyKeybrd = new InlineKeyboard().text('Заказать', 'buy').row().text('< Назад', 'catalog_delete')
 const categotyKeyboards = {textureKeybrd, exclusiveKeybrd, lightningKeybrd}
 
 // НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
@@ -56,12 +57,21 @@ bot.callbackQuery('start', async (ctx) => {
    })
    await ctx.answerCallbackQuery()
 });
-bot.callbackQuery('texture', async (ctx) => {
+bot.callbackQuery('buy', async (ctx) => {
    await ctx.callbackQuery.message.editText('Выберите тип потолка', {
-      reply_markup: textureKeybrd
+      reply_markup: textureKeybrd,
+      
    })
    await ctx.answerCallbackQuery()
 });
+bot.callbackQuery('what_choose', async (ctx) => {
+   await ctx.callbackQuery.message.editText('<b>Не можете определиться с выбором?</b> Не беспокойтесь, это нормально! Натяжные потолки — это важный элемент интерьера, который служит долгие годы. Мы предлагаем бесплатную консультацию, чтобы помочь вам выбрать идеальный вариант, который будет соответствовать вашим вкусам и потребностям. Наши специалисты готовы ответить на все ваши вопросы и предложить лучшие решения, исходя из вашего бюджета и стиля интерьера. <b>Свяжитесь с нами сегодня!</b>', {
+      reply_markup: new InlineKeyboard().text('Оставить заявку', 'buy').row().text('<< Назад', 'catalog'),
+      parse_mode: 'HTML'
+   })
+   await ctx.answerCallbackQuery()
+});
+
 
 // Определение циклом категорий
 Object.keys(data).forEach(category => {
@@ -75,8 +85,9 @@ Object.keys(data).forEach(category => {
    })
    // Определение циклом типов потолков
    data[category].forEach(type => {
+      const captionText = `${type.description} \n \n <b>Цена от: ${type.price} руб/м2</b>`
       bot.callbackQuery(type.path, async (ctx) => {
-         await ctx.replyWithPhoto(type.img, {caption: type.description, reply_markup: buyKeybrd})
+         await ctx.replyWithPhoto(type.img, {caption: captionText, parse_mode: 'HTML', reply_markup: buyKeybrd})
          await ctx.answerCallbackQuery()
       })
    })
