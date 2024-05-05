@@ -23,9 +23,11 @@ const buyKeybrd = new InlineKeyboard().text('Купить', 'buy').row().text('<
 const categotyKeyboards = {textureKeybrd, exclusiveKeybrd, lightningKeybrd}
 
 // НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
-data.texture.forEach(val => textureKeybrd.text(val.name, val.path).row())
-data.exclusive.forEach(val => exclusiveKeybrd.text(val.name, val.path).row())
-data.lightning.forEach(val => lightningKeybrd.text(val.name, val.path).row())
+Object.keys(data).forEach(type => {
+   data[type].forEach(val => {
+      categotyKeyboards[type + 'Keybrd'].text(val.name, val.path).row()
+   })
+})
 
 // КОМАНДЫ
 bot.command('start', async (ctx) => {
@@ -61,26 +63,29 @@ bot.callbackQuery('texture', async (ctx) => {
    await ctx.answerCallbackQuery()
 });
 
-// циклом назначил клавиатуры для возможных категорий
+// Определение циклом категорий
 Object.keys(data).forEach(category => {
    const keyboardName = category + 'Keybrd'
    const keyboard = categotyKeyboards[keyboardName]
-   // console.log(keyboard);
    bot.callbackQuery(category, async (ctx) => {
       await ctx.callbackQuery.message.editText('Выберите тип потолка', {
          reply_markup: keyboard
       })
       await ctx.answerCallbackQuery()
    })
-})
-
-// обработка каждых потолков в списке по текстуре
-data.texture.forEach(type => {
-   bot.callbackQuery(type.path, async (ctx) => {
-      await ctx.replyWithPhoto(type.img, {caption: type.description, reply_markup: buyKeybrd})
+   // Определение циклом типов потолков
+   data[category].forEach(type => {
+      bot.callbackQuery(type.path, async (ctx) => {
+         await ctx.replyWithPhoto(type.img, {caption: type.description, reply_markup: buyKeybrd})
+         await ctx.answerCallbackQuery()
+      })
    })
 })
 
+// возврат назад - удаление сообщения
+bot.callbackQuery('catalog_delete', async (ctx) => {
+   await ctx.deleteMessage()
+})
 
 // РАЗНЫЕ СЛУШАТЕЛИ
 bot.on('msg', async(ctx) => {
