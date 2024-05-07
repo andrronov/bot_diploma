@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { Bot, InlineKeyboard, GrammyError, HttpError } from 'grammy'
+import { Bot, InlineKeyboard, GrammyError, HttpError, session } from 'grammy'
 import { hydrate } from '@grammyjs/hydrate'
 import data from './data.js'
 
@@ -12,7 +12,15 @@ bot.api.setMyCommands([
    { command: 'support', description: 'Обратиться в техподдержку' },
 ])
 
-// КЛАВИАТУРЫ
+// ДАННЫЕ СЕССИИ
+function initial() {
+   return { isName: false, isPhone: false };
+ }
+ bot.use(session({ initial }));
+
+ let userName, userPhone
+
+ // КЛАВИАТУРЫ
 const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').row().text('О нас', 'cart').text('Наш сайт', 'orders')
 //это основная клава с категорией подсветки const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('С подсветкой', 'lightning').row().text('Не знаете, что выбрать?', 'what_choose').row().text('<< Назад', 'start')
 const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('Не определились с выбором?', 'what_choose').row().text('<< Назад', 'start')
@@ -21,6 +29,8 @@ const exclusiveKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalo
 const lightningKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 // доработать
 const buyKeybrd = new InlineKeyboard().text('Заказать', 'buy').row().text('< Назад', 'catalog_delete')
+const backKeybrd = new InlineKeyboard().text('<< Назад', 'catalog_delete')
+
 const categotyKeyboards = {textureKeybrd, exclusiveKeybrd, lightningKeybrd}
 
 // НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
@@ -58,10 +68,11 @@ bot.callbackQuery('start', async (ctx) => {
    await ctx.answerCallbackQuery()
 });
 bot.callbackQuery('buy', async (ctx) => {
-   await ctx.callbackQuery.message.editText('Выберите тип потолка', {
-      reply_markup: textureKeybrd,
-      
+   await ctx.deleteMessage()
+   await ctx.reply('Введите Ваше имя:', {
+      reply_markup: backKeybrd,
    })
+   ctx.session.isName = true
    await ctx.answerCallbackQuery()
 });
 bot.callbackQuery('what_choose', async (ctx) => {
@@ -95,13 +106,43 @@ Object.keys(data).forEach(category => {
 
 // возврат назад - удаление сообщения
 bot.callbackQuery('catalog_delete', async (ctx) => {
+   ctx.session.isName = false
+   ctx.session.isPhone = false
    await ctx.deleteMessage()
 })
 
 // РАЗНЫЕ СЛУШАТЕЛИ
-bot.on('msg', async(ctx) => {
-   await ctx.reply('jby')
+bot.on('msg', async (ctx) => {
+   console.log(ctx.message.text)
+   if(ctx.session.isName && ctx.session.isPhone){
+      userPhone = ctx.message.text
+      await bot.api.sendMessage(-1002060568122, `Заявка! \n Имя: ${userName}, Телефон: ${userPhone}`)
+      await ctx.reply(`<b>Заявка принята!</b> \n Имя: ${userName}, Телефон: ${userPhone} \n Ожидайте обратной связи!`, {
+         parse_mode: 'HTML'
+      })
+   } else if (ctx.session.isName){
+      userName = ctx.message.text
+      await ctx.reply('Номер телефона:', {
+         reply_markup: backKeybrd
+      })
+      ctx.session.isPhone = true
+   } else {
+      await ctx.reply('Я не понимаю Вас. Пожалуйста, используйте кнопки навигации')
+   }
 })
+
+// bot.on('msg', async(ctx) => {
+//    if(ctx.session.isName){
+//       userName = ctx.message.text
+//       console.log(userName)
+//       await ctx.reply('Номер телефона:', {
+//          reply_markup: backKeybrd
+//       })
+//       ctx.session.isPhone = true
+//    } else {
+//       await ctx.reply('Я не понимаю Вас. Пожалуйста, используйте кнопки навигации')
+//    }
+// })
 
 bot.catch((err) => {
    const ctx = err.ctx;
