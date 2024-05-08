@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Bot, InlineKeyboard, GrammyError, HttpError, session } from 'grammy'
 import { hydrate } from '@grammyjs/hydrate'
-import data from './data.js'
+import { data, admins_id } from './data.js'
 
 const bot = new Bot(process.env.BOT_API_KEY)
 bot.use(hydrate())
@@ -14,21 +14,18 @@ bot.api.setMyCommands([
 
 // ДАННЫЕ СЕССИИ
 function initial() {
-   return { isName: false, isPhone: false };
+   return { isName: false, isPhone: false, isSupportMode: false };
  }
  bot.use(session({ initial }));
 
- let userName, userPhone, userOption
- userOption = 'Не определён'
+let userName, userPhone, userOption = 'Не определён'
 
  // КЛАВИАТУРЫ
 const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').row().text('О нас', 'us').text('Наш сайт', 'our_cite')
-//это основная клава с категорией подсветки const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('С подсветкой', 'lightning').row().text('Не знаете, что выбрать?', 'what_choose').row().text('<< Назад', 'start')
 const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('Не определились с выбором?', 'what_choose').row().text('<< Назад', 'start')
 const textureKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const exclusiveKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const lightningKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
-// доработать
 const buyKeybrd = new InlineKeyboard().text('Заказать', 'buy').row().text('< Назад', 'catalog_delete')
 const backKeybrd = new InlineKeyboard().text('<< Назад', 'catalog_delete')
 
@@ -49,9 +46,12 @@ bot.command('start', async (ctx) => {
    })
    ctx.react("❤")
 });
-// доделать
+
 bot.command('support', async (ctx) => {
-   await ctx.reply('')
+   await ctx.reply('У Вас есть вопрос? Напишите его одним сообшением, и наш администратор ответит Вам как можно скорее!', {
+      reply_markup: backKeybrd
+   })
+   ctx.session.isSupportMode = true
 });
 
 
@@ -93,7 +93,7 @@ bot.callbackQuery('us', async (ctx) => {
 });
 bot.callbackQuery('our_cite', async (ctx) => {
    await ctx.replyWithPhoto('https://jby-group.ru/wp-content/themes/jby-theme/assets/images/logo.png',{
-      reply_markup: backKeybrd, parse_mode: 'HTML', caption: 'Посетите наш сайт, чтобы увидеть полный ассортимент натяжных потолков, которые мы предлагаем. На сайте вы найдете подробные описания и фотографии наших работ, что поможет вам сделать правильный выбор. Наш сайт предоставляет удобный интерфейс для ознакомления с различными вариантами и стилями потолков, а также вы можете оставить заявку прямо там. Переходите на сайт «JBY-Group» и убедитесь в качестве и разнообразии наших услуг! \n \n <a href="https://arsen-project.onrender.com">JBY-Group</a>'})
+      reply_markup: backKeybrd, parse_mode: 'HTML', caption: '<a href="https://arsen-project.onrender.com">Посетите наш сайт</a>, чтобы увидеть полный ассортимент натяжных потолков, которые мы предлагаем. На сайте вы найдете подробные описания и фотографии наших работ, что поможет вам сделать правильный выбор. Наш сайт предоставляет удобный интерфейс для ознакомления с различными вариантами и стилями потолков, а также вы можете оставить заявку прямо там. Переходите на сайт «JBY-Group» и убедитесь в качестве и разнообразии наших услуг! \n \n <a href="https://arsen-project.onrender.com">JBY-Group</a>'})
    await ctx.answerCallbackQuery()
 });
 
@@ -123,15 +123,20 @@ Object.keys(data).forEach(category => {
 bot.callbackQuery('catalog_delete', async (ctx) => {
    ctx.session.isName = false
    ctx.session.isPhone = false
-   ctx.session.isOption = false
+   ctx.session.isSupportMode = false
    await ctx.deleteMessage()
 })
 
 // РАЗНЫЕ СЛУШАТЕЛИ
 bot.on('msg', async (ctx) => {
+   // Ответ службы поддержки
+   if(ctx.chat.id == process.env.BOT_CHANNEL){
+      let origin_chat_id = ctx.msg.reply_to_message.text.split('Chat_id: ')[1]
+      return bot.api.sendMessage(origin_chat_id, `Ответ службы поддержки на Ваше обращение! \n \n <b>${ctx.update.channel_post.text}</b>`, {parse_mode: 'HTML'})
+   }
    if(ctx.session.isName && ctx.session.isPhone){
       userPhone = ctx.message.text
-      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Заявка! \n Имя: ${userName} \n Телефон: ${userPhone} \n Выбранный потолок: ${userOption}`)
+      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Заявка! \n Имя: <b>${userName}</b> \n <b>Телефон: ${userPhone}</b> \n <b>Выбранный потолок: ${userOption}</b>`, {parse_mode: 'HTML'})
       await ctx.reply(`<b>Заявка принята!</b> \n Имя: ${userName} \n Телефон: ${userPhone} \n Выбранный потолок: ${userOption} \n \n <b>Ожидайте обратной связи!</b>`, {
          parse_mode: 'HTML',
          reply_markup: new InlineKeyboard().text('В меню', 'start')
@@ -144,8 +149,18 @@ bot.on('msg', async (ctx) => {
          reply_markup: backKeybrd
       })
       ctx.session.isPhone = true
+   } else if (ctx.session.isSupportMode){
+      await ctx.reply('Вопрос отправлен, ответ придет очень скоро!', {
+         reply_markup: new InlineKeyboard().text('В меню', 'start')
+      })
+      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Обращение в поддержку! \n <b>${ctx.message.text}</b> \n Chat_id: ${ctx.chat.id}`, {
+         parse_mode: 'HTML'
+      })
+      ctx.session.isSupportMode = false
    } else {
-      await ctx.reply('Я не понимаю Вас. Пожалуйста, используйте кнопки навигации')
+      await ctx.reply('Я не понимаю Вас. Пожалуйста, используйте кнопки навигации', {
+         reply_markup: new InlineKeyboard().text('< В меню', 'start')
+      })
    }
 })
 
