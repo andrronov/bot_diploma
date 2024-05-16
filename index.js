@@ -40,7 +40,7 @@ Object.keys(data).forEach(type => {
 
 // КОМАНДЫ
 bot.command('start', async (ctx) => {
-   await ctx.reply(`<b>${ctx.from.first_name}, добро пожаловать в магазин <a href='https://arsen-project.onrender.com/#/'>JBY-Group</a>!</b>`, {
+   await ctx.reply(`<b>${ctx.from.first_name}, добро пожаловать в магазин <a href='https://jby-group.onrender.com/#/'>JBY-Group</a>!</b>`, {
       reply_markup: menuKbrd,
       parse_mode: 'HTML'
    })
@@ -93,7 +93,7 @@ bot.callbackQuery('us', async (ctx) => {
 });
 bot.callbackQuery('our_cite', async (ctx) => {
    await ctx.replyWithPhoto('https://jby-group.ru/wp-content/themes/jby-theme/assets/images/logo.png',{
-      reply_markup: backKeybrd, parse_mode: 'HTML', caption: '<a href="https://arsen-project.onrender.com">Посетите наш сайт</a>, чтобы увидеть полный ассортимент натяжных потолков, которые мы предлагаем. На сайте вы найдете подробные описания и фотографии наших работ, что поможет вам сделать правильный выбор. Наш сайт предоставляет удобный интерфейс для ознакомления с различными вариантами и стилями потолков, а также вы можете оставить заявку прямо там. Переходите на сайт «JBY-Group» и убедитесь в качестве и разнообразии наших услуг! \n \n <a href="https://arsen-project.onrender.com">JBY-Group</a>'})
+      reply_markup: backKeybrd, parse_mode: 'HTML', caption: '<a href="https://jby-group.onrender.com">Посетите наш сайт</a>, чтобы увидеть полный ассортимент натяжных потолков, которые мы предлагаем. На сайте вы найдете подробные описания и фотографии наших работ, что поможет вам сделать правильный выбор. Наш сайт предоставляет удобный интерфейс для ознакомления с различными вариантами и стилями потолков, а также вы можете оставить заявку прямо там. Переходите на сайт «JBY-Group» и убедитесь в качестве и разнообразии наших услуг! \n \n <a href="https://jby-group.onrender.com">JBY-Group</a>'})
    await ctx.answerCallbackQuery()
 });
 
