@@ -25,16 +25,15 @@ const menuKbrd = new InlineKeyboard().text('Каталог', 'catalog').row().te
 const catalogKeybrd = new InlineKeyboard().text('По фактуре', 'texture').row().text('Эксклюзивные', 'exclusive').row().text('Не определились с выбором?', 'what_choose').row().text('<< Назад', 'start')
 const textureKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const exclusiveKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
-const lightningKeybrd = new InlineKeyboard().row().text('<< Назад', 'catalog')
 const buyKeybrd = new InlineKeyboard().text('Заказать', 'buy').row().text('< Назад', 'catalog_delete')
 const backKeybrd = new InlineKeyboard().text('<< Назад', 'catalog_delete')
 
-const categotyKeyboards = {textureKeybrd, exclusiveKeybrd, lightningKeybrd}
+const categoryKeyboards = {textureKeybrd, exclusiveKeybrd}
 
-// НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР
+// НАПОЛНЕНИЕ КНОПКАМИ КЛАВИАТУР ДЛЯ ПОТОЛКОВ ИЗ КАТЕГОРИИ
 Object.keys(data).forEach(type => {
    data[type].forEach(val => {
-      categotyKeyboards[type + 'Keybrd'].text(val.name, val.path).row()
+      categoryKeyboards[type + 'Keybrd'].text(val.name, val.path).row()
    })
 })
 
@@ -101,7 +100,7 @@ bot.callbackQuery('our_cite', async (ctx) => {
 // Определение циклом категорий
 Object.keys(data).forEach(category => {
    const keyboardName = category + 'Keybrd'
-   const keyboard = categotyKeyboards[keyboardName]
+   const keyboard = categoryKeyboards[keyboardName]
    bot.callbackQuery(category, async (ctx) => {
       await ctx.callbackQuery.message.editText('Выберите тип потолка', {
          reply_markup: keyboard

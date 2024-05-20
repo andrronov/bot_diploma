@@ -36,23 +36,23 @@ export const data = {
         description: 'Перфорированные натяжные потолки стали известны относительно недавно, но уже завоевали популярность. Перфорированный натяжной потолок в Москве и Московской области представляет собой двух- или многоуровневую конструкцию, в которой в полотне нижнего уровня вырезаны отверстия. Резные натяжные потолки отличаются неповторимостью дизайна, с помощью светильников и подсветки разного типа можно добиться удивительных объёмных эффектов. 3д натяжные потолки устанавливают в квартирах и частных домах, нередко натяжной потолок 3д можно увидеть в кафе, баре или ресторане.',
         img: 'https://jby-group.ru//wp-content/uploads/2020/03/perforirovannyj-natyazhnoj-potolok-4.jpg', price: 900}
     ],
-    lightning: [
-        {path: 'slott', name: 'Световый линии SLOTT',
-        description: '',
-        img: '', price: 0}, 
-        {path: 'flexy', name: 'Световый линии Flexy',
-        description: '',
-        img: '', price: 0}, 
-        {path: 'floating', name: 'Парящие',
-        description: '',
-        img: '', price: 0}, 
-        {path: 'contour', name: 'Контурный',
-        description: '',
-        img: '', price: 0}, 
-        {path: 'illumination', name: 'Подсветка через полотно',
-        description: '',
-        img: '', price: 0}
-    ]
+    // lightning: [
+    //     {path: 'slott', name: 'Световый линии SLOTT',
+    //     description: '',
+    //     img: '', price: 0}, 
+    //     {path: 'flexy', name: 'Световый линии Flexy',
+    //     description: '',
+    //     img: '', price: 0}, 
+    //     {path: 'floating', name: 'Парящие',
+    //     description: '',
+    //     img: '', price: 0}, 
+    //     {path: 'contour', name: 'Контурный',
+    //     description: '',
+    //     img: '', price: 0}, 
+    //     {path: 'illumination', name: 'Подсветка через полотно',
+    //     description: '',
+    //     img: '', price: 0}
+    // ]
  }
 
  export const admins_id = [6156633512, 6868913969]
