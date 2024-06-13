@@ -2,6 +2,7 @@ import 'dotenv/config'
 import { Bot, InlineKeyboard, GrammyError, HttpError, session } from 'grammy'
 import { hydrate } from '@grammyjs/hydrate'
 import { data, admins_id } from './data.js'
+import './port.js'
 
 const bot = new Bot(process.env.BOT_API_KEY)
 bot.use(hydrate())
