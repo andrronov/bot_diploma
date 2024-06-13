@@ -135,7 +135,7 @@ bot.on('msg', async (ctx) => {
    }
    if(ctx.session.isName && ctx.session.isPhone){
       userPhone = ctx.message.text
-      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Заявка! \n Имя: <b>${userName}</b> \n <b>Телефон: ${userPhone}</b> \n <b>Выбранный потолок: ${userOption}</b>`, {parse_mode: 'HTML'})
+      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Заявка! \n Имя: <b>${userName}</b> \n <b>Телефон: ${userPhone}</b> \n <b>Пользователь: @${ctx.from.username}</b> \n <b>Выбранный потолок: ${userOption}</b>`, {parse_mode: 'HTML'})
       await ctx.reply(`<b>Заявка принята!</b> \n Имя: ${userName} \n Телефон: ${userPhone} \n Выбранный потолок: ${userOption} \n \n <b>Ожидайте обратной связи!</b>`, {
          parse_mode: 'HTML',
          reply_markup: new InlineKeyboard().text('В меню', 'start')
@@ -152,7 +152,7 @@ bot.on('msg', async (ctx) => {
       await ctx.reply('Вопрос отправлен, ответ придет очень скоро!', {
          reply_markup: new InlineKeyboard().text('В меню', 'start')
       })
-      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Обращение в поддержку! \n <b>${ctx.message.text}</b> \n Chat_id: ${ctx.chat.id}`, {
+      await bot.api.sendMessage(process.env.BOT_CHANNEL, `Обращение в поддержку! \n <b>Пользователь: @${ctx.from.username}</b> \n <b>${ctx.message.text}</b> \n Chat_id: ${ctx.chat.id}`, {
          parse_mode: 'HTML'
       })
       ctx.session.isSupportMode = false
